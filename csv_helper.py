@@ -37,3 +37,12 @@ def calculate_mutation_score(csv_path):
         )
 
 
+def create_output_file(path: str):
+    with open(path, mode="w", newline="") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(["Bug ID", "Mutation Score", "Condition Coverage", "Bug Present"])
+
+def save_row(path: str, row: list):
+    with open(path, mode="a", newline="") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow(row)

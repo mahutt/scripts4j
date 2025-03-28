@@ -6,10 +6,14 @@ from defects4j_commands import (
     generate_coverage_report,
     generate_mutation_report,
 )
-from csv_helper import calculate_mutation_score, process_csv
+from csv_helper import calculate_mutation_score, create_output_file, process_csv, save_row
+
+
+SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
+output_dir = f"{SCRIPT_DIR}/output"
+os.makedirs(output_dir, exist_ok=True)
 
 SELECTED_PROJECT_NAMES = ["Closure", "Math", "JacksonDatabind"]
-
 
 def analyze_project(project_name, defects4j_path):
     bugs_csv_path = (
@@ -18,7 +22,8 @@ def analyze_project(project_name, defects4j_path):
     bug_info = process_csv(bugs_csv_path)
 
     # schema: [[bug_id, mutation_score, condition_coverage, bug_present]]
-    project_data = []
+    output_csv_path = f"{SCRIPT_DIR}/output/{project_name}_analysis.csv"
+    create_output_file(output_csv_path)
 
     for bug in bug_info:
         bug_id = bug["bug_id"]
@@ -33,7 +38,7 @@ def analyze_project(project_name, defects4j_path):
         generate_mutation_report()
         mutation_score = calculate_mutation_score("summary.csv")
 
-        project_data.append([bug_id, mutation_score, condition_coverage, True])
+        save_row(output_csv_path, [bug_id, mutation_score, condition_coverage, True])
 
         # Now doing fixed version
 
@@ -46,9 +51,7 @@ def analyze_project(project_name, defects4j_path):
         generate_mutation_report()
         mutation_score = calculate_mutation_score("summary.csv")
 
-        project_data.append([bug_id, mutation_score, condition_coverage, False])
-
-    return project_data
+        save_row(output_csv_path, [bug_id, mutation_score, condition_coverage, False])
 
 
 def main():
@@ -59,8 +62,8 @@ def main():
     os.chdir(args.defects4j_path)
     for project_name in SELECTED_PROJECT_NAMES:
         print(f"Analyzing {project_name}")
-        project_data = analyze_project(project_name, args.defects4j_path)
-        print(project_data)
+        analyze_project(project_name, args.defects4j_path)
+
 
 
 if __name__ == "__main__":
