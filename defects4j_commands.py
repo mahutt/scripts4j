@@ -2,7 +2,7 @@ import subprocess
 
 
 def checkout_project(project_name: str, bug_id: int, type: str) -> str:
-    project_path = f"/tmp/defects4j_experiment/{project_name}"
+    project_path = f"/tmp/defects4j_experiment/{project_name}/{bug_id}/{type}"
     checkout_command = (
         f"defects4j checkout -p {project_name} -v {bug_id}{type} -w {project_path}"
     )

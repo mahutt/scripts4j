@@ -1,5 +1,7 @@
 import os
 import argparse
+import multiprocessing
+from multiprocessing import Pool
 from coverage import extract_real_condition_coverage
 from defects4j_commands import (
     checkout_project,
@@ -20,6 +22,53 @@ output_dir = f"{SCRIPT_DIR}/output"
 os.makedirs(output_dir, exist_ok=True)
 
 
+def process_bug(args):
+    bug, project_name, id_range, id_history, output_csv_path = args
+    bug_id = bug["bug_id"]
+    id_int = int(bug_id)
+
+    if id_int < id_range[0] or id_range[1] < id_int:
+        return
+
+    print(f"Analyzing bug {id_int}")
+
+    if (id_int, True) in id_history:
+        print(f"Skipping {id_int}b")
+    else:
+        print(f"Proceeding with {id_int}b")
+        project_path = checkout_project(project_name, bug_id, "b")
+        os.chdir(project_path)
+
+        generate_coverage_report()
+        condition_coverage = extract_real_condition_coverage("coverage.xml")
+
+        generate_mutation_report()
+        mutation_score = calculate_mutation_score("summary.csv")
+
+        save_row(
+            output_csv_path, [bug_id, mutation_score, condition_coverage, True]
+        )
+
+    # Now doing fixed version
+
+    if (id_int, False) in id_history:
+        print(f"Skipping {id_int}f")
+    else:
+        print(f"Proceeding with {id_int}f")
+        project_path = checkout_project(project_name, bug_id, "f")
+        os.chdir(project_path)
+
+        generate_coverage_report()
+        condition_coverage = extract_real_condition_coverage("coverage.xml")
+
+        generate_mutation_report()
+        mutation_score = calculate_mutation_score("summary.csv")
+
+        save_row(
+            output_csv_path, [bug_id, mutation_score, condition_coverage, False]
+        )
+
+
 def analyze_project(project_name, defects4j_path, id_range):
     bugs_csv_path = (
         f"{defects4j_path}/framework/projects/{project_name}/active-bugs.csv"
@@ -38,50 +87,13 @@ def analyze_project(project_name, defects4j_path, id_range):
         (int(bug["bug_id"]), bug["bug_present"] == "True"): bug for bug in history_list
     }
 
-    for bug in bug_info:
-        bug_id = bug["bug_id"]
-        id_int = int(bug_id)
+    num_cores = multiprocessing.cpu_count()
 
-        if id_int < id_range[0] or id_range[1] < id_int:
-            continue
+    args_list = [(bug, project_name, id_range, id_history, output_csv_path) 
+                 for bug in bug_info]
 
-        print(f"Analyzing bug {id_int}")
-
-        if (id_int, True) in id_history:
-            print(f"Skipping {id_int}b")
-        else:
-            print(f"Proceeding with {id_int}b")
-            project_path = checkout_project(project_name, bug_id, "b")
-            os.chdir(project_path)
-
-            generate_coverage_report()
-            condition_coverage = extract_real_condition_coverage("coverage.xml")
-
-            generate_mutation_report()
-            mutation_score = calculate_mutation_score("summary.csv")
-
-            save_row(
-                output_csv_path, [bug_id, mutation_score, condition_coverage, True]
-            )
-
-        # Now doing fixed version
-
-        if (id_int, False) in id_history:
-            print(f"Skipping {id_int}f")
-        else:
-            print(f"Proceeding with {id_int}b")
-            project_path = checkout_project(project_name, bug_id, "f")
-            os.chdir(project_path)
-
-            generate_coverage_report()
-            condition_coverage = extract_real_condition_coverage("coverage.xml")
-
-            generate_mutation_report()
-            mutation_score = calculate_mutation_score("summary.csv")
-
-            save_row(
-                output_csv_path, [bug_id, mutation_score, condition_coverage, False]
-            )
+    with Pool(processes=num_cores) as pool:
+        pool.map(process_bug, args_list)
 
 
 def parse_id_range(value):
