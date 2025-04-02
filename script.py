@@ -69,7 +69,7 @@ def process_bug(args):
         )
 
 
-def analyze_project(project_name, defects4j_path, id_range):
+def analyze_project(project_name, defects4j_path, id_range, process_count):
     bugs_csv_path = (
         f"{defects4j_path}/framework/projects/{project_name}/active-bugs.csv"
     )
@@ -87,12 +87,10 @@ def analyze_project(project_name, defects4j_path, id_range):
         (int(bug["bug_id"]), bug["bug_present"] == "True"): bug for bug in history_list
     }
 
-    num_cores = multiprocessing.cpu_count()
-
     args_list = [(bug, project_name, id_range, id_history, output_csv_path) 
                  for bug in bug_info]
 
-    with Pool(processes=num_cores) as pool:
+    with Pool(processes=process_count) as pool:
         pool.map(process_bug, args_list)
 
 
@@ -116,12 +114,12 @@ def main():
     parser.add_argument(
         "id_range", type=parse_id_range, help="Defect ID range in the format 'min-max'"
     )
+    parser.add_argument("--process_count", help="Chosen process count", default=multiprocessing.cpu_count())
     args = parser.parse_args()
 
     os.chdir(args.defects4j_path)
-    print(f"Analyzing {args.project_name}")
-    analyze_project(args.project_name, args.defects4j_path, args.id_range)
-
+    print(f"Analyzing {args.project_name} with {int(args.process_count)} processes")
+    analyze_project(args.project_name, args.defects4j_path, args.id_range, int(args.process_count))
 
 if __name__ == "__main__":
     main()
