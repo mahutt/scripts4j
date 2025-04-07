@@ -19,6 +19,7 @@ def extract_project_name(file_name):
 
 def create_box_plot(buggy_df, non_buggy_df, project_name):
     # Conditional Coverage
+    plt.figure()
     plt.boxplot([buggy_df["Condition Coverage"], non_buggy_df["Condition Coverage"]], tick_labels=["Pre-fix", "Post-fix"])
     plt.ylabel("Condition Coverage (%)")
     plt.title(f"{project_name} Condition Coverage Box Plot")
