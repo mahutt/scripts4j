@@ -14,21 +14,20 @@ def calculate_pb(project_name: str):
     pb_cov = stats.pointbiserialr(cov_array, bool_array)
 
     print(
-    f"""
-    We calculate a Point-Biserial Correlation coefficient of\n
-    r = {pb_cov[0]} with p-value\n
-    p = {pb_cov[1]} for coverage and bugs existing in {project_name}.
-    """
+f"""
+We calculate a Point-Biserial Correlation coefficient of
+r = {pb_cov[0]} with p-value
+p = {pb_cov[1]} for coverage and bugs existing in {project_name}.
+"""
     )
 
     pb_mut = stats.pointbiserialr(mut_array, bool_array)
 
     print(
-    f"""
-    We calculate a Point-Biserial Correlation coefficient of\n
-    r = {pb_mut[0]} with p-value\n
-    p = {pb_mut[1]} for mutation score and bugs existing in {project_name}.
-    """
+f"""We calculate a Point-Biserial Correlation coefficient of
+r = {pb_mut[0]} with p-value
+p = {pb_mut[1]} for mutation score and bugs existing in {project_name}.
+"""
     )
 
 
@@ -49,21 +48,20 @@ def combined_pb():
     combined_pb_cov = stats.pointbiserialr(combined_cov_array, combined_bool_array)
 
     print(
-    f"""
-    We calculate a Point-Biserial Correlation coefficient of\n
-    r = {combined_pb_cov[0]} with p-value\n
-    p = {combined_pb_cov[1]} for coverage and bugs existing in the combined projects.
-    """
+f"""
+We calculate a Point-Biserial Correlation coefficient of
+r = {combined_pb_cov[0]} with p-value
+p = {combined_pb_cov[1]} for coverage and bugs existing in the combined projects.
+"""
     )
 
     combined_pb_mut = stats.pointbiserialr(combined_mut_array, combined_bool_array)
 
     print(
-    f"""
-    We calculate a Point-Biserial Correlation coefficient of\n
-    r = {combined_pb_cov[0]} with p-value\n
-    p = {combined_pb_mut[1]} for mutation score and bugs existing in the combined projects.
-    """
+f"""We calculate a Point-Biserial Correlation coefficient of
+r = {combined_pb_cov[0]} with p-value
+p = {combined_pb_mut[1]} for mutation score and bugs existing in the combined projects.
+"""
     )
 
 
