@@ -49,14 +49,51 @@ def box_plot_from_output_file(file):
     buggy_df, non_buggy_df = create_dataframe(f"{data_path}/{file}")
     project_name = extract_project_name(file)
     create_box_plot(buggy_df, non_buggy_df, project_name)
+    return buggy_df, non_buggy_df
+
+
+def create_combined_box_plot(all_buggy_dfs, all_non_buggy_dfs):
+    # Combine all dataframes
+    combined_buggy_df = pd.concat(all_buggy_dfs)
+    combined_non_buggy_df = pd.concat(all_non_buggy_dfs)
+
+    # Conditional Coverage
+    plt.figure(figsize=(10, 6))
+    plt.boxplot(
+        [
+            combined_buggy_df["Condition Coverage"],
+            combined_non_buggy_df["Condition Coverage"],
+        ],
+        tick_labels=["Pre-fix", "Post-fix"],
+    )
+    plt.ylabel("Condition Coverage (%)")
+    plt.title("Combined Condition Coverage Box Plot")
+    plt.savefig(f"{box_plot_dir}/combined_conditional_coverage_box_plot.pdf")
+
+    # Mutation Score
+    plt.figure(figsize=(10, 6))
+    plt.boxplot(
+        [combined_buggy_df["Mutation Score"], combined_non_buggy_df["Mutation Score"]],
+        tick_labels=["Pre-fix", "Post-fix"],
+    )
+    plt.ylabel("Mutation Score (%)")
+    plt.title("Combined Mutation Score Box Plot")
+    plt.savefig(f"{box_plot_dir}/combined_mutation_score_box_plot.pdf")
 
 
 def main():
     csv_files = get_csv_files()
+    all_buggy_dfs = []
+    all_non_buggy_dfs = []
 
     for file in csv_files:
         print(f"Making box plot for {file}...")
-        box_plot_from_output_file(file)
+        buggy_df, non_buggy_df = box_plot_from_output_file(file)
+        all_buggy_dfs.append(buggy_df)
+        all_non_buggy_dfs.append(non_buggy_df)
+
+    print("Creating combined box plot...")
+    create_combined_box_plot(all_buggy_dfs, all_non_buggy_dfs)
 
 
 if __name__ == "__main__":
