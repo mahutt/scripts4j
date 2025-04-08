@@ -28,7 +28,7 @@ def create_box_plot(buggy_df, non_buggy_df, project_name):
     )
     plt.ylabel("Condition Coverage (%)")
     plt.title(f"{project_name} Condition Coverage Box Plot")
-    plt.savefig(f"{box_plot_dir}/{project_name}_conditional_coverage_box_plot.pdf")
+    plt.savefig(f"{box_plot_dir}/{project_name}_conditional_coverage_box_plot.png")
 
     # Mutation Score
     plt.figure()
@@ -38,7 +38,7 @@ def create_box_plot(buggy_df, non_buggy_df, project_name):
     )
     plt.ylabel("Mutation Score (%)")
     plt.title(f"{project_name} Mutation Score Box Plot")
-    plt.savefig(f"{box_plot_dir}/{project_name}_mutation_score_box_plot.pdf")
+    plt.savefig(f"{box_plot_dir}/{project_name}_mutation_score_box_plot.png")
 
 
 def get_csv_files():
@@ -68,7 +68,7 @@ def create_combined_box_plot(all_buggy_dfs, all_non_buggy_dfs):
     )
     plt.ylabel("Condition Coverage (%)")
     plt.title("Combined Condition Coverage Box Plot")
-    plt.savefig(f"{box_plot_dir}/combined_conditional_coverage_box_plot.pdf")
+    plt.savefig(f"{box_plot_dir}/combined_conditional_coverage_box_plot.png")
 
     # Mutation Score
     plt.figure(figsize=(10, 6))
@@ -78,7 +78,7 @@ def create_combined_box_plot(all_buggy_dfs, all_non_buggy_dfs):
     )
     plt.ylabel("Mutation Score (%)")
     plt.title("Combined Mutation Score Box Plot")
-    plt.savefig(f"{box_plot_dir}/combined_mutation_score_box_plot.pdf")
+    plt.savefig(f"{box_plot_dir}/combined_mutation_score_box_plot.png")
 
 
 def main():
