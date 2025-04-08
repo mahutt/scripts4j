@@ -60,16 +60,21 @@ def combined_pb():
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="Find biserial correlations for Defects4J projects"
-    )
-    parser.add_argument("--project_name", help="Chosen project name")
-    args = parser.parse_args()
+    # Get all CSV files in the output directory
+    csv_files = glob.glob("./output/*_analysis.csv")
 
-    if args.project_name:
-        calculate_pb(args.project_name)
-    else:
-        combined_pb()
+    # Process each project individually
+    for file in csv_files:
+        # Extract project name from filename (remove path and _analysis.csv suffix)
+        project_name = os.path.basename(file).replace("_analysis.csv", "")
+        print(f"Processing {project_name}...")
+        calculate_pb(project_name)
+
+    # Process all projects combined
+    print("Processing combined data...")
+    combined_pb()
+
+    print("All analysis complete!")
 
 
 if __name__ == "__main__":
