@@ -3,6 +3,7 @@ import pandas as pd
 from scipy import stats
 import glob
 import os
+from boxplotter import box_plot_from_output_file
 
 
 def calculate_pb(project_name: str, results_df=None):
@@ -70,6 +71,10 @@ def main():
         project_name = os.path.basename(file).replace("_analysis.csv", "")
         print(f"Processing {project_name}...")
         all_results = calculate_pb(project_name, all_results)
+
+        # Create box plot for the project
+        box_plot_from_output_file(file.split("/")[-1])
+        print(f"Box plot for {project_name} created.")
 
     # Process all projects combined
     print("Processing combined data...")
